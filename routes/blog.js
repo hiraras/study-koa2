@@ -12,8 +12,8 @@ const {
 router.prefix('/api/blog');
 
 router.get('/list', loginCheck, async (ctx, next) => {
-  const { isAdmin, keyword } = ctx.request.query;
-  let { author } = ctx.request.query;
+  const { isAdmin, keyword } = ctx.query;
+  let { author } = ctx.query;
   if (isAdmin) {
     author = ctx.session.username;
   }
@@ -26,7 +26,7 @@ router.get('/list', loginCheck, async (ctx, next) => {
 });
 
 router.get('/detail', loginCheck, async (ctx, next) => {
-  const { id } = ctx.request.query;
+  const { id } = ctx.query;
   try {
     const result = await getDetail(id);
     ctx.body = new SuccessModel(result);
@@ -37,8 +37,9 @@ router.get('/detail', loginCheck, async (ctx, next) => {
 
 router.post('/new', loginCheck, async (ctx, next) => {
   try {
-    ctx.request.body.author = ctx.session.username;
-    const result = await newBlog(ctx.request.body);
+    const body = ctx.request.body;
+    body.author = ctx.session.username;
+    const result = await newBlog(body);
     ctx.body = new SuccessModel(result);
   } catch(err) {
     ctx.body = new ErrorModel(null, err.message);
@@ -47,8 +48,9 @@ router.post('/new', loginCheck, async (ctx, next) => {
 
 router.post('/update', loginCheck, async (ctx, next) => {
   try {
-    ctx.request.body.author = ctx.session.username;
-    const result = await updateBlog(ctx.request.body);
+    const body = ctx.request.body;
+    body.author = ctx.session.username;
+    const result = await updateBlog(body);
     ctx.body = new SuccessModel(result);
   } catch(err) {
     ctx.body = new ErrorModel(null, err.message);

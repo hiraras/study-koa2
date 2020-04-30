@@ -98,6 +98,9 @@
 	function createElem(data) {
 		const $ctn = $('#ctn');
 		$ctn.empty();
+		if (!Array.isArray(data)) {
+			return;
+		}
 		data.map(elem => {
 			const $elem = $('<div></div>');
 			$elem.addClass('item');
