@@ -11,7 +11,7 @@ const {
 
 router.prefix('/api/blog');
 
-router.get('/list', loginCheck, async (ctx, next) => {
+router.get('/list', async (ctx, next) => {
   const { isAdmin, keyword } = ctx.query;
   let { author } = ctx.query;
   if (isAdmin) {
@@ -25,7 +25,7 @@ router.get('/list', loginCheck, async (ctx, next) => {
   }
 });
 
-router.get('/detail', loginCheck, async (ctx, next) => {
+router.get('/detail', async (ctx, next) => {
   const { id } = ctx.query;
   try {
     const result = await getDetail(id);
