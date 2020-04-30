@@ -37,9 +37,11 @@ router.get('/detail', loginCheck, async (ctx, next) => {
 
 router.post('/new', loginCheck, async (ctx, next) => {
   try {
+    ctx.request.body.author = ctx.session.username;
     const result = await newBlog(ctx.request.body);
     ctx.body = new SuccessModel(result);
   } catch(err) {
+    console.log(err)
     ctx.body = new ErrorModel(err);
   }
 });

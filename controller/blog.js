@@ -28,7 +28,7 @@ const newBlog = (data = {}) => {
     values ('${title}', '${content}', ${Date.now()}, '${data.author}');
   `;
   return exec(sql).then(insertData => {
-    if (updateResult.affectedRows > 0) {
+    if (insertData.affectedRows > 0) {
       return Promise.resolve({ id: insertData.insertId });
     } else {
       return Promise.reject('fail to add new blog');
