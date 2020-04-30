@@ -11,7 +11,7 @@ router.post('/login', async function(ctx, next) {
     ctx.session.realname = realname;
     ctx.body = new SuccessModel({ username, realname });
   } catch(err) {
-    ctx.body = new ErrorModel(err);
+    ctx.body = new ErrorModel(null, err.message);
   }
 });
 
@@ -20,7 +20,7 @@ router.get('/logout', async function(ctx, next) {
     ctx.session = null;
     ctx.body = new SuccessModel('已登出');
   } catch(err) {
-    ctx.body = new ErrorModel(err);
+    ctx.body = new ErrorModel(null, err.message);
   }
 });
 

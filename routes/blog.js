@@ -21,7 +21,7 @@ router.get('/list', loginCheck, async (ctx, next) => {
     const result = await getList(author, keyword);
     ctx.body = new SuccessModel(result);
   } catch(err) {
-    ctx.body = new ErrorModel(err);
+    ctx.body = new ErrorModel(null, err.message);
   }
 });
 
@@ -31,7 +31,7 @@ router.get('/detail', loginCheck, async (ctx, next) => {
     const result = await getDetail(id);
     ctx.body = new SuccessModel(result);
   } catch(err) {
-    ctx.body = new ErrorModel(err);
+    ctx.body = new ErrorModel(null, err.message);
   }
 });
 
@@ -41,8 +41,7 @@ router.post('/new', loginCheck, async (ctx, next) => {
     const result = await newBlog(ctx.request.body);
     ctx.body = new SuccessModel(result);
   } catch(err) {
-    console.log(err)
-    ctx.body = new ErrorModel(err);
+    ctx.body = new ErrorModel(null, err.message);
   }
 });
 
@@ -52,7 +51,7 @@ router.post('/update', loginCheck, async (ctx, next) => {
     const result = await updateBlog(ctx.request.body);
     ctx.body = new SuccessModel(result);
   } catch(err) {
-    ctx.body = new ErrorModel(err);
+    ctx.body = new ErrorModel(null, err.message);
   }
 });
 
@@ -61,7 +60,7 @@ router.delete('/del/:id', loginCheck, async (ctx, next) => {
     const result = await deleteBlog(ctx.params.id, ctx.session.username);
     ctx.body = new SuccessModel(result);
   } catch(err) {
-    ctx.body = new ErrorModel(err);
+    ctx.body = new ErrorModel(null, err.message);
   }
 });
 
