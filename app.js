@@ -5,9 +5,14 @@ const json = require('koa-json')
 const onerror = require('koa-onerror')
 const bodyparser = require('koa-bodyparser')
 const logger = require('koa-logger')
+const RedisStore = require('ioredis-koa')
+const session = require('koa-generic-session')
 
 const index = require('./routes/index')
 const users = require('./routes/users')
+const blog = require('./routes/blog');
+const user = require('./routes/user');
+const { REDIS_CONF } = require('./conf/db');
 
 // error handler
 onerror(app)
@@ -32,9 +37,28 @@ app.use(async (ctx, next) => {
   console.log(`${ctx.method} ${ctx.url} - ${ms}ms`)
 })
 
+const redisStore = RedisStore({
+  port: REDIS_CONF.port,          // Redis port
+  host: REDIS_CONF.host,   // Redis host
+  family: 4,           // 4 (IPv4) or 6 (IPv6)
+})
+app.keys = ['JfEEFIKfLjjie_21342J_feji']
+app.use(session({
+  store: redisStore,
+  cookie: {
+    path: '/',
+    maxAge: 86400000,
+    overwrite: true,
+    httpOnly: true,
+    signed: true
+  }
+}))
+
 // routes
 app.use(index.routes(), index.allowedMethods())
 app.use(users.routes(), users.allowedMethods())
+app.use(blog.routes(), blog.allowedMethods())
+app.use(user.routes(), user.allowedMethods())
 
 // error-handling
 app.on('error', (err, ctx) => {

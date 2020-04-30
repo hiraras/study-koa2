@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title style="white-space: pre">admin</title>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+		}
+
+		body {
+			font-size: 16px;
+		}
+
+		#ctn {
+			margin-top: 16px;
+		}
+		#logout {
+			position: absolute;
+			right: 8px;
+			top: 8px;
+			color: blue;
+			cursor: pointer;
+		}
+
+		.item {
+			border: 1px solid black;
+			padding: 8px;
+			margin-bottom: 20px;
+			border-radius: 8px;
+            color: blue;
+            display: flex;
+            justify-content: space-between;
+		}
+		.title {
+			cursor: pointer;
+            display: inline-block;
+            width: 240px;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+		}
+		.time {
+			color: #333;
+		}
+		.operation {
+				cursor: pointer;
+		}
+	</style>
+</head>
+
+<body>
+	<h2>Admin</h2>
+	<a id="logout">登出</a>
+	<input placeholder="根据关键词" id="keyword" />
+    <button id="search">搜索</button>
+    <button id="create-btn">新建</button>
+	<div id="ctn"></div>
+</body>
+<script src="./js/jquery-1.8.3.js"></script>
+<script type="text/javascript">
+	$(function () {
+		search();
+		$('#ctn').on('click', '.title', function () {
+			window.location.href = '/detail.html?id=' + $(this).closest('.item').attr('blog-id');
+		});
+		$('#ctn').on('click', '.edit', function () {
+			window.location.href = '/edit.html?id=' + $(this).closest('.item').attr('blog-id');
+		});
+		$('#ctn').on('click', '.del', function () {
+			delBlog($(this).closest('.item').attr('blog-id'));
+		});
+	});
+	$('#search').on('click', function () {
+		const keyword = $('#keyword').val();
+		search(keyword);
+    });
+    $('#create-btn').on('click', function () {
+		window.location.href = '/create';
+	});
+	$('#logout').on('click', function() {
+		$.ajax({
+			async: true,
+			url: '/api/user/logout',
+			cache: false,
+			dataType: 'json', // 返回数据的数据类型
+			type: 'GET',
+			success: function (result) {
+				console.log(result);
+			},
+			error: function (err) {
+				console.log(err);
+			}
+		});
+	});
+	function createElem(data) {
+		const $ctn = $('#ctn');
+		$ctn.empty();
+		data.map(elem => {
+			const $elem = $('<div></div>');
+			$elem.addClass('item');
+			$elem.attr('blog-id', elem.id);
+			const $title = $('<p></p>');
+			$title.addClass('title');
+			$title.append(elem.title);
+			const $time = $('<span></span>');
+			$time.addClass('time');
+			$time.text(formatTime(elem.createtime));
+			const $editBtn = $('<a></a>');
+			$editBtn.text('编辑');
+			$editBtn.addClass('operation edit');
+			const $delBtn = $('<a></a>');
+			$delBtn.text('删除');
+			$delBtn.addClass('operation del');
+			$elem.append($title);
+			$elem.append($time);
+			$elem.append($editBtn);
+			$elem.append($delBtn);
+			$ctn.append($elem);
+		});
+	}
+	function formatTime(milliSecond) {
+		const d = new Date(milliSecond);
+		return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+	}
+	function search(keyword = '') {
+		$.ajax({
+			async: true,
+			url: '/api/blog/list',
+			data: {
+                keyword,
+                isAdmin: true
+			},
+			cache: false,
+			dataType: 'json', // 返回数据的数据类型
+			type: 'GET',
+			success: function (result) {
+				createElem(result.data);
+			},
+			error: function (err) {
+				console.log(err);
+			}
+		});
+	}
+
+	function delBlog(id) {
+		if (!id) {
+			alert('获取id失败');
+			return ;
+		}
+		$.ajax({
+			async: true,
+			url: '/api/blog/del/' + id,
+			cache: false,
+			dataType: 'json', // 返回数据的数据类型
+			type: 'DELETE',
+			success: function (result) {
+				search();
+			},
+			error: function (err) {
+				console.log(err);
+			}
+		});
+	}
+</script>
+
+</html>

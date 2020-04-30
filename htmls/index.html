@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title style="white-space: pre">home</title>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+		}
+
+		body {
+			font-size: 16px;
+		}
+
+		#ctn {
+			margin-top: 16px;
+		}
+
+		.item {
+			border: 1px solid black;
+			padding: 8px;
+			margin-bottom: 20px;
+			border-radius: 8px;
+			color: blue;
+		}
+		.title {
+			cursor: pointer;
+			display: inline-block;
+		}
+		.user {
+			margin-right: 8px;
+			color: black;
+			font-weight: bold;
+		}
+		.time {
+			color: #333;
+		}
+	</style>
+</head>
+
+<body>
+	<h2>博客首页</h2>
+	<input placeholder="根据作者" id="author" />
+	<input placeholder="根据关键词" id="keyword" />
+	<button id="search">搜索</button>
+	<div id="ctn"></div>
+</body>
+<script src="./js/jquery-1.8.3.js"></script>
+<script type="text/javascript">
+	$(function () {
+		search();
+		$('#ctn').on('click', '.title', function () {
+			window.location.href = '/detail.html?id=' + $(this).closest('.item').attr('blog-id');
+		});
+	});
+	$('#search').on('click', function () {
+		const author = $('#author').val();
+		const keyword = $('#keyword').val();
+		search(author, keyword);
+	});
+	function createElem(data) {
+		const $ctn = $('#ctn');
+		$ctn.empty();
+		data.map(elem => {
+			const $elem = $('<div></div>');
+			$elem.addClass('item');
+			$elem.attr('blog-id', elem.id)
+			const $title = $('<h3></h3>');
+			$title.addClass('title');
+			$title.append(elem.title);
+			const $content = $('<div></div>');
+			$content.addClass('content');
+			const $user = $('<span></span>');
+			$user.addClass('user');
+			$user.text(elem.author);
+			const $time = $('<span></span>');
+			$time.addClass('time');
+			$time.text(formatTime(elem.createtime));
+			$content.append($user);
+			$content.append($time);
+			$elem.append($title);
+			$elem.append($content);
+			$ctn.append($elem);
+		});
+	}
+	function formatTime(milliSecond) {
+		const d = new Date(milliSecond);
+		return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+	}
+	function search(author = '', keyword = '') {
+		$.ajax({
+			async: true,
+			url: '/api/blog/list',
+			data: {
+				author,
+				keyword
+			},
+			cache: false,
+			dataType: 'json', // 返回数据的数据类型
+			type: 'GET',
+			success: function (result) {
+				if (Array.isArray(result.data)) {
+					createElem(result.data);
+				}
+			},
+			error: function (err) {
+				console.log(err);
+			}
+		});
+	}
+</script>
+
+</html>

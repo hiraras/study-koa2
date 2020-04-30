@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title style="white-space: pre">edit</title>
+    <style>
+        #blog-title {
+            width: 200px;
+            height: 24px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 id="title">更新博客</h1>
+    <div class="content">
+        <input type="text" id="blog-title" placeholder="请输入标题" />
+        <br />
+        <textarea id="blog-content" cols="40" rows="10" placeholder="请输入内容"></textarea>
+        <br />
+        <button id="submit">提交</button>
+    </div>
+</body>
+<script src="./js/jquery-1.8.3.js"></script>
+<script type="text/javascript">
+    function getQuery() {
+        const str = location.search.slice(1);
+        const arr = str.split('&');
+        const obj = {};
+        arr.map(item => {
+            const [key, val] = item.split('=');
+            obj[key] = val;
+        });
+        return obj;
+    }
+    $(function () {
+       getDetail();
+    });
+    function getDetail() {
+        $.ajax({
+            async: true,
+            url: '/api/blog/detail',
+            data: {
+                id: getQuery().id
+            },
+            cache: false,
+            dataType: 'json', // 返回数据的数据类型
+            type: 'GET',
+            success: function (result) {
+                const data = result.data[0];
+                $('#blog-title').val(data.title);
+                $('#blog-content').val(data.content);
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        });
+    }
+
+    $('#submit').on('click', function () {
+        const params = {
+            title: $('#blog-title').val(),
+            content: $('#blog-content').val(),
+            id: getQuery().id,
+        }
+        $.ajax({
+            async: true,
+            url: '/api/blog/update',
+            data: JSON.stringify(params),
+            cache: false,
+            contentType: 'application/json',
+            dataType: 'json', // 返回数据的数据类型
+            type: 'POST',
+            success: function (result) {
+                if (result.errno === 0) {
+                    alert('提交成功');
+                    window.history.back();
+                }
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        });
+    })
+</script>
+
+</html>
